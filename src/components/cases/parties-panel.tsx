@@ -55,7 +55,7 @@ export function PartiesPanel({
   return (
     <div className="grid gap-6">
       {canEdit && (
-        <div className="grid gap-2 rounded-lg border border-dashed p-3 sm:grid-cols-[1fr_180px_auto] sm:items-center">
+        <div className="grid gap-2 rounded-lg border border-dashed bg-card p-3 sm:grid-cols-[1fr_180px_auto] sm:items-center">
           <PersonPicker options={options} value={personId} defaultRole={role} onChange={(p) => setPersonId(p.id)} onCreated={(p) => setOptions((o) => [...o, p])} />
           <NativeSelect value={role} onChange={(e) => setRole(e.target.value as PartyRole)} aria-label="Role in case">
             {PARTY_ROLES.map((r) => (
@@ -78,7 +78,7 @@ export function PartiesPanel({
             </h3>
             <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
               {g.items.map((p) => (
-                <li key={p.id} className="flex items-start gap-3 rounded-lg border p-3">
+                <li key={p.id} className="flex items-start gap-3 rounded-lg border bg-card p-3">
                   <UserAvatar name={p.person.full_name} />
                   <div className="min-w-0 flex-1">
                     <Link href={`/people/${p.person.id}`} className="block truncate text-sm font-medium hover:underline">

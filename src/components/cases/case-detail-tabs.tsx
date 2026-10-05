@@ -98,7 +98,7 @@ export function CaseDetailTabs({
               </div>
             )}
           </div>
-          <dl className="grid content-start gap-4 rounded-lg border p-4 sm:grid-cols-2 lg:grid-cols-1">
+          <dl className="grid content-start gap-4 rounded-lg border bg-card p-4 sm:grid-cols-2 lg:grid-cols-1">
             <Detail label="Filing date">{formatDate(c.date_filed, "long")}</Detail>
             <Detail label="Next hearing">{c.next_hearing ? `${formatDate(c.next_hearing, "long")}, ${formatTime(c.next_hearing)}` : "None scheduled"}</Detail>
             <Detail label="Deadline">{c.deadline ? formatDate(c.deadline, "long") : "—"}</Detail>
@@ -125,7 +125,7 @@ export function CaseDetailTabs({
         {detail.events.length === 0 ? (
           <EmptyState icon={CalendarXIcon} title="No hearings or events" description="Hearings, conferences and deadlines for this case will appear here." />
         ) : (
-          <ul className="divide-y rounded-lg border">
+          <ul className="divide-y rounded-lg border bg-card">
             {detail.events.map((e) => (
               <li key={e.id}>
                 <Link

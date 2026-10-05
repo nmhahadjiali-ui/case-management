@@ -60,8 +60,12 @@ export const updateUserSchema = z.object({
 })
 export type UpdateUserInput = z.infer<typeof updateUserSchema>
 
+export const OATH_ALIGNMENTS = ["center", "left", "justify", "right"] as const
+export type OathAlign = (typeof OATH_ALIGNMENTS)[number]
+
 export const oathSchema = z.object({
   title: requiredText("Title", 120),
   body: requiredText("Text", 10000),
+  align: z.enum(OATH_ALIGNMENTS),
 })
 export type OathInput = z.infer<typeof oathSchema>

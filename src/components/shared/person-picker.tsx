@@ -60,7 +60,7 @@ export function PersonPicker({
               type="button"
               variant="outline"
               aria-invalid={invalid || undefined}
-              className="w-full justify-between font-normal"
+              className="w-full justify-between bg-card font-normal"
             />
           }
         >

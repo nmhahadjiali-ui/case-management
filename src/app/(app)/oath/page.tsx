@@ -6,16 +6,26 @@ import { requireSession } from "@/lib/auth"
 import { createClient } from "@/lib/supabase/server"
 import { isAdmin } from "@/lib/permissions"
 import { formatDate } from "@/lib/datetime"
+import { cn } from "@/lib/utils"
+import { OATH_ALIGNMENTS, type OathAlign } from "@/lib/validations/settings"
 
 export const metadata: Metadata = { title: "Oath" }
+
+const ALIGN_CLASS: Record<OathAlign, string> = {
+  center: "text-center",
+  left: "text-left",
+  justify: "text-justify",
+  right: "text-right",
+}
 
 export default async function OathPage() {
   const session = await requireSession()
   const supabase = await createClient()
   const { data } = await supabase.from("app_settings").select("value, updated_at").eq("key", "oath").maybeSingle()
-  const oath = (data?.value as { title?: string; body?: string } | undefined) ?? {}
+  const oath = (data?.value as { title?: string; body?: string; align?: OathAlign } | undefined) ?? {}
   const title = oath.title ?? "Oath of Service"
   const body = oath.body ?? ""
+  const align: OathAlign = OATH_ALIGNMENTS.includes(oath.align as OathAlign) ? oath.align! : "center"
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -28,9 +38,9 @@ export default async function OathPage() {
             <h1 className="font-serif text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h1>
             <div className="h-px w-16 bg-border" aria-hidden />
           </div>
-          <div className="space-y-4 font-serif text-base leading-relaxed sm:text-lg">
+          <div className={cn("space-y-4 font-serif text-base leading-relaxed sm:text-lg", ALIGN_CLASS[align])}>
             {body ? (
-              body.split(/\n{2,}/).map((p, i) => <p key={i}>{p}</p>)
+              body.split(/\n{2,}/).map((p, i) => <p key={i} dir="auto">{p}</p>)
             ) : (
               <p className="text-center text-muted-foreground">No oath text has been set.</p>
             )}
@@ -40,7 +50,7 @@ export default async function OathPage() {
           )}
         </CardContent>
       </Card>
-      {isAdmin(session.profile.role) && <OathEditor title={title} body={body} />}
+      {isAdmin(session.profile.role) && <OathEditor title={title} body={body} align={align} />}
     </div>
   )
 }

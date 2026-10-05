@@ -114,7 +114,7 @@ export function DocumentsPanel({
   return (
     <div className="grid gap-4">
       {canUpload && (
-        <form onSubmit={upload} className="grid gap-3 rounded-lg border border-dashed p-4 sm:grid-cols-[1fr_200px_auto] sm:items-end">
+        <form onSubmit={upload} className="grid gap-3 rounded-lg border border-dashed bg-card p-4 sm:grid-cols-[1fr_200px_auto] sm:items-end">
           <div className="grid gap-1.5">
             <Label htmlFor="doc-file">File</Label>
             <Input id="doc-file" ref={fileRef} type="file" multiple disabled={uploading} />
@@ -138,7 +138,7 @@ export function DocumentsPanel({
       {documents.length === 0 ? (
         <EmptyState icon={FileIcon} title="No documents yet" description="Complaints, affidavits, orders and other files will appear here." />
       ) : (
-        <ul className="divide-y rounded-lg border">
+        <ul className="divide-y rounded-lg border bg-card">
           {documents.map((d) => {
             const Icon = iconFor(d.file_type)
             return (

@@ -81,7 +81,7 @@ export function NotesPanel({
       ) : (
         <ul className="grid gap-3">
           {notes.map((n) => (
-            <li key={n.id} className="flex gap-3 rounded-lg border p-3">
+            <li key={n.id} className="flex gap-3 rounded-lg border bg-card p-3">
               <UserAvatar name={n.author?.full_name} size="sm" />
               <div className="min-w-0 flex-1">
                 <p className="text-xs text-muted-foreground">

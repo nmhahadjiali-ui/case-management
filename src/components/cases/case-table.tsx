@@ -25,6 +25,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "@/components/ui/context-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { CasePriorityBadge, CaseStatusBadge } from "@/components/shared/badges"
 import { ConfirmDialog } from "@/components/shared/confirm-dialog"
@@ -106,35 +107,44 @@ export function CaseTable({
 
   const ids = [...selected]
 
-  function RowMenu({ c }: { c: CaseListItem }) {
+  /** View / Edit / Archive / Delete — shared by the "⋯" button and the right-click menu. */
+  function RowMenuItems({ c }: { c: CaseListItem }) {
     const editable = canEditCase(role, userId, c)
+    return (
+      <>
+        <DropdownMenuItem onClick={() => router.push(`/cases/${c.id}`)}>
+          <EyeIcon /> View
+        </DropdownMenuItem>
+        {editable && (
+          <DropdownMenuItem onClick={() => router.push(`/cases/${c.id}/edit`)}>
+            <PencilIcon /> Edit
+          </DropdownMenuItem>
+        )}
+        {editable && c.status !== "archived" && (
+          <DropdownMenuItem onClick={() => setConfirm({ kind: "archive", ids: [c.id] })}>
+            <ArchiveIcon /> Archive
+          </DropdownMenuItem>
+        )}
+        {manager && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem variant="destructive" onClick={() => setConfirm({ kind: "delete", ids: [c.id] })}>
+              <Trash2Icon /> Delete
+            </DropdownMenuItem>
+          </>
+        )}
+      </>
+    )
+  }
+
+  function RowMenu({ c }: { c: CaseListItem }) {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" aria-label={`Actions for case ${c.case_number}`} />}>
           <MoreHorizontalIcon />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-40">
-          <DropdownMenuItem onClick={() => router.push(`/cases/${c.id}`)}>
-            <EyeIcon /> View
-          </DropdownMenuItem>
-          {editable && (
-            <DropdownMenuItem onClick={() => router.push(`/cases/${c.id}/edit`)}>
-              <PencilIcon /> Edit
-            </DropdownMenuItem>
-          )}
-          {editable && c.status !== "archived" && (
-            <DropdownMenuItem onClick={() => setConfirm({ kind: "archive", ids: [c.id] })}>
-              <ArchiveIcon /> Archive
-            </DropdownMenuItem>
-          )}
-          {manager && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem variant="destructive" onClick={() => setConfirm({ kind: "delete", ids: [c.id] })}>
-                <Trash2Icon /> Delete
-              </DropdownMenuItem>
-            </>
-          )}
+          <RowMenuItems c={c} />
         </DropdownMenuContent>
       </DropdownMenu>
     )
@@ -205,7 +215,9 @@ export function CaseTable({
           </TableHeader>
           <TableBody>
             {rows.map((c) => (
-              <TableRow key={c.id} data-state={selected.has(c.id) ? "selected" : undefined}>
+              // Right-clicking a row opens the same actions as its "⋯" button.
+              <ContextMenu key={c.id}>
+              <ContextMenuTrigger render={<TableRow data-state={selected.has(c.id) ? "selected" : undefined} />}>
                 {writable && (
                   <TableCell>
                     <Checkbox
@@ -229,7 +241,11 @@ export function CaseTable({
                 <TableCell><CasePriorityBadge priority={c.priority} /></TableCell>
                 <TableCell className="whitespace-nowrap">{c.next_hearing ? formatDateTime(c.next_hearing) : "—"}</TableCell>
                 <TableCell><RowMenu c={c} /></TableCell>
-              </TableRow>
+              </ContextMenuTrigger>
+              <ContextMenuContent className="w-40">
+                <RowMenuItems c={c} />
+              </ContextMenuContent>
+              </ContextMenu>
             ))}
           </TableBody>
         </Table>
