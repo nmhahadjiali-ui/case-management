@@ -3,7 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google"
 import { ThemeProvider } from "next-themes"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { Toaster } from "@/components/ui/sonner"
-import { APP_NAME, APP_TAGLINE } from "@/lib/constants"
+import { SplashScreen } from "@/components/layout/splash-screen"
+import { APP_NAME, APP_TAGLINE, SPLASH_SEEN_KEY } from "@/lib/constants"
 import "./globals.css"
 
 const geistSans = Geist({ variable: "--font-sans", subsets: ["latin"] })
@@ -17,7 +18,16 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`} suppressHydrationWarning>
+      <head>
+        {/* Hide the splash before first paint if this tab has already seen it. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(sessionStorage.getItem(${JSON.stringify(SPLASH_SEEN_KEY)}))document.documentElement.dataset.splash="off"}catch(e){}`,
+          }}
+        />
+      </head>
       <body className="min-h-full">
+        <SplashScreen />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <TooltipProvider delay={300}>{children}</TooltipProvider>
           <Toaster richColors closeButton position="top-right" />

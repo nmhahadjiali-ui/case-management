@@ -5,6 +5,8 @@ export const APP_NAME = "CaseFlow"
 export const APP_TAGLINE = "Case Management System"
 export const APP_DEVELOPER = "Nahed M. Hadji Ali"
 export const APP_COPYRIGHT_START = 2026
+/** sessionStorage key: the splash screen was already shown in this tab. */
+export const SPLASH_SEEN_KEY = "caseflow:splash-seen"
 
 export type Option<T extends string = string> = { value: T; label: string }
 
