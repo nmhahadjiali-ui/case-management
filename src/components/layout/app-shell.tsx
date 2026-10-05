@@ -7,6 +7,7 @@ import { Button, buttonVariants } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Sidebar } from "@/components/layout/sidebar"
+import { AppFooter } from "@/components/layout/app-footer"
 import { CalendarMenu } from "@/components/layout/calendar-menu"
 import { NotificationsMenu } from "@/components/layout/notifications-menu"
 import { DateTimeDisplay, Greeting } from "@/components/layout/header-clock"
@@ -106,6 +107,8 @@ export function AppShell({
         <main id="main" className="mx-auto w-full max-w-[1600px] flex-1 p-4 sm:p-6">
           {children}
         </main>
+        <AppFooter className="border-t bg-card px-4 py-3" />
+
       </div>
     </div>
   )

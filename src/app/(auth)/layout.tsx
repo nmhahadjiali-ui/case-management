@@ -1,4 +1,5 @@
 import { ScaleIcon } from "lucide-react"
+import { AppFooter } from "@/components/layout/app-footer"
 import { APP_NAME, APP_TAGLINE } from "@/lib/constants"
 
 export default function AuthLayout({ children }: LayoutProps<"/">) {
@@ -14,6 +15,8 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
         </div>
       </div>
       <div className="w-full max-w-sm">{children}</div>
+      {/* The About page needs a session, so no link here. */}
+      <AppFooter className="mt-10" showAboutLink={false} />
     </div>
   )
 }
