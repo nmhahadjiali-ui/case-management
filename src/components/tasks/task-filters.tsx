@@ -20,7 +20,7 @@ export function TaskFilters({
   return (
     <div className="grid gap-3">
       <div className="-mx-1 overflow-x-auto px-1">
-        <div className="flex w-max gap-1 rounded-lg bg-muted p-1" role="group" aria-label="Task filter">
+        <div className="flex w-max gap-1 rounded-lg border bg-card p-1" role="group" aria-label="Task filter">
           {TASK_FILTERS.map((f) => (
             <button
               key={f.value}
@@ -29,7 +29,7 @@ export function TaskFilters({
               onClick={() => setParams({ filter: f.value === "all" ? "" : f.value })}
               className={cn(
                 "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                filters.filter === f.value ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                filters.filter === f.value ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"
               )}
             >
               {f.label}

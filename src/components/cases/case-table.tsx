@@ -11,7 +11,6 @@ import {
   PencilIcon,
   RefreshCwIcon,
   Trash2Icon,
-  UserCheckIcon,
   XIcon,
 } from "lucide-react"
 import { toast } from "sonner"
@@ -36,20 +35,18 @@ import { formatDate, formatDateTime } from "@/lib/datetime"
 import { canEditCase, canManage, canWrite } from "@/lib/permissions"
 import { cn } from "@/lib/utils"
 import type { UserRole } from "@/lib/constants"
-import type { CaseListItem, ProfileOption } from "@/lib/types"
+import type { CaseListItem } from "@/lib/types"
 import type { ActionResult } from "@/lib/action-result"
 
 type Confirm = { kind: "delete" | "archive"; ids: string[] } | null
 
 export function CaseTable({
   rows,
-  staff,
   role,
   userId,
   hasFilters,
 }: {
   rows: CaseListItem[]
-  staff: ProfileOption[]
   role: UserRole
   userId: string
   hasFilters: boolean
@@ -168,22 +165,6 @@ export function CaseTable({
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
-            <DropdownMenu>
-              <DropdownMenuTrigger render={<Button variant="outline" size="sm" disabled={busy} />}>
-                <UserCheckIcon /> Assign staff
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="max-h-72 w-52">
-                <DropdownMenuGroup>
-                  <DropdownMenuLabel>Assign to</DropdownMenuLabel>
-                  <DropdownMenuItem onClick={() => run(() => updateCasesBulk(ids, { assigned_to: null }))}>Unassigned</DropdownMenuItem>
-                  {staff.map((s) => (
-                    <DropdownMenuItem key={s.id} onClick={() => run(() => updateCasesBulk(ids, { assigned_to: s.id }))}>
-                      {s.full_name}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
             <Button variant="outline" size="sm" disabled={busy} onClick={() => setConfirm({ kind: "archive", ids })}>
               <ArchiveIcon /> Archive
             </Button>
@@ -197,9 +178,9 @@ export function CaseTable({
       )}
 
       {/* Desktop / tablet table */}
-      <div className="hidden overflow-hidden rounded-lg border md:block">
-        <Table>
-          <TableHeader className="bg-muted/40">
+      <div className="hidden overflow-hidden rounded-lg border bg-card md:block">
+        <Table className="bg-card">
+          <TableHeader className="bg-card">
             <TableRow>
               {writable && (
                 <TableHead className="w-10">

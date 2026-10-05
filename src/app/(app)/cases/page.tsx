@@ -40,7 +40,7 @@ export default async function CasesPage({ searchParams }: PageProps<"/cases">) {
           <CaseFilters filters={filters} caseTypes={lookups.caseTypes} />
         </CardContent>
       </Card>
-      <CaseTable rows={rows} staff={lookups.staff} role={session.profile.role} userId={session.userId} hasFilters={hasFilters} />
+      <CaseTable rows={rows} role={session.profile.role} userId={session.userId} hasFilters={hasFilters} />
       <Pagination page={filters.page} perPage={filters.per} total={total} />
     </div>
   )
