@@ -26,6 +26,21 @@ export type Profile = {
 
 export type ProfileOption = Pick<Profile, "id" | "full_name" | "role">
 
+export type EmailChangeRequest = {
+  id: string
+  user_id: string
+  current_email: string
+  new_email: string
+  reason: string | null
+  status: "pending" | "approved" | "rejected" | "cancelled"
+  review_note: string | null
+  reviewed_by: string | null
+  reviewed_at: string | null
+  created_at: string
+  user?: Pick<Profile, "full_name" | "avatar_url" | "role"> | null
+  reviewer?: Pick<Profile, "full_name"> | null
+}
+
 export type UserSettings = {
   user_id: string
   hearing_reminders: boolean

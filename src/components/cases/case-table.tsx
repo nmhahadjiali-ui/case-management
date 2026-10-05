@@ -218,7 +218,6 @@ export function CaseTable({
               <TableHead>Date Filed</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Priority</TableHead>
-              <TableHead>Assigned To</TableHead>
               <TableHead>Next Hearing</TableHead>
               <TableHead className="w-12"><span className="sr-only">Actions</span></TableHead>
             </TableRow>
@@ -247,7 +246,6 @@ export function CaseTable({
                 <TableCell className="whitespace-nowrap">{formatDate(c.date_filed)}</TableCell>
                 <TableCell><CaseStatusBadge status={c.status} /></TableCell>
                 <TableCell><CasePriorityBadge priority={c.priority} /></TableCell>
-                <TableCell className="max-w-36 truncate">{c.assigned_to_name ?? <span className="text-muted-foreground">Unassigned</span>}</TableCell>
                 <TableCell className="whitespace-nowrap">{c.next_hearing ? formatDateTime(c.next_hearing) : "—"}</TableCell>
                 <TableCell><RowMenu c={c} /></TableCell>
               </TableRow>
@@ -283,7 +281,6 @@ export function CaseTable({
                   <dt className="text-muted-foreground">Complainant</dt><dd className="truncate">{c.complainants ?? "—"}</dd>
                   <dt className="text-muted-foreground">Defendant</dt><dd className="truncate">{c.defendants ?? "—"}</dd>
                   <dt className="text-muted-foreground">Filed</dt><dd>{formatDate(c.date_filed)}</dd>
-                  <dt className="text-muted-foreground">Assigned</dt><dd className="truncate">{c.assigned_to_name ?? "Unassigned"}</dd>
                   <dt className="text-muted-foreground">Next hearing</dt><dd>{c.next_hearing ? formatDateTime(c.next_hearing) : "—"}</dd>
                 </dl>
               </div>

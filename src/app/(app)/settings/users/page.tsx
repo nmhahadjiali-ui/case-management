@@ -1,10 +1,11 @@
 import type { Metadata } from "next"
 import { SettingsSection } from "@/components/settings/settings-section"
 import { UsersManager } from "@/components/settings/users-manager"
+import { EmailRequestsManager } from "@/components/settings/email-requests"
 import { requireRole } from "@/lib/auth"
 import { getLookups } from "@/lib/data/lookups"
 import { createClient } from "@/lib/supabase/server"
-import type { Profile } from "@/lib/types"
+import type { EmailChangeRequest, Profile } from "@/lib/types"
 
 export const metadata: Metadata = { title: "Users & Roles" }
 
@@ -21,13 +22,29 @@ const PERMISSIONS: [string, string, string, string, string][] = [
 export default async function UsersPage() {
   const session = await requireRole("administrator")
   const supabase = await createClient()
-  const [{ data }, lookups] = await Promise.all([
+  const requestSelect =
+    "*, user:profiles!email_change_requests_user_id_fkey(full_name, avatar_url, role), reviewer:profiles!email_change_requests_reviewed_by_fkey(full_name)"
+  const [{ data }, lookups, pending, recent] = await Promise.all([
     supabase.from("profiles").select("*").order("is_active", { ascending: false }).order("full_name"),
     getLookups(),
+    supabase.from("email_change_requests").select(requestSelect).eq("status", "pending").order("created_at"),
+    supabase
+      .from("email_change_requests")
+      .select(requestSelect)
+      .in("status", ["approved", "rejected"])
+      .order("reviewed_at", { ascending: false })
+      .limit(10),
   ])
+  const pendingRequests = (pending.data ?? []) as unknown as EmailChangeRequest[]
 
   return (
     <>
+      <SettingsSection
+        title={`Email change requests${pendingRequests.length ? ` (${pendingRequests.length})` : ""}`}
+        description="Users must ask an administrator to change their sign-in email."
+      >
+        <EmailRequestsManager pending={pendingRequests} recent={(recent.data ?? []) as unknown as EmailChangeRequest[]} />
+      </SettingsSection>
       <SettingsSection title="Users" description="Create accounts, assign roles and activate or deactivate users.">
         <UsersManager users={(data ?? []) as Profile[]} departments={lookups.departments} currentUserId={session.userId} />
       </SettingsSection>

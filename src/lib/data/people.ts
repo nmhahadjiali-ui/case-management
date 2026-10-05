@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import { PARTY_ROLES } from "@/lib/constants"
 import { sanitizeSearch } from "@/lib/data/cases"
 import type { Note, Person, PersonListItem } from "@/lib/types"
-import type { CasePriority, CaseStatus, PartyRole } from "@/lib/constants"
+import type { CasePriority, CaseStatus, EventStatus, PartyRole } from "@/lib/constants"
 
 export type PeopleFilters = { q: string; role: string; status: string; type: string; page: number }
 
@@ -84,8 +84,40 @@ export async function getPersonDetail(id: string) {
   return {
     person: person.data as Person,
     cases,
+    hearings: await getPersonHearings(id, cases.map((h) => h.case.id)),
     notes: (notes.data ?? []) as unknown as Note[],
   }
+}
+
+export type PersonHearing = {
+  id: string
+  title: string
+  subtype: string | null
+  status: EventStatus
+  starts_at: string
+  location: string | null
+  case: { id: string; case_number: string } | null
+}
+
+/** Hearings in any case the person is a party to, plus hearings they are listed on directly. Newest first. */
+async function getPersonHearings(personId: string, caseIds: string[]) {
+  const supabase = await createClient()
+  const select = "id, title, subtype, status, starts_at, location, case:cases(id, case_number)"
+  const [byCase, byParticipant] = await Promise.all([
+    caseIds.length
+      ? supabase.from("events").select(select).eq("event_type", "hearing").in("case_id", caseIds)
+      : Promise.resolve({ data: [] }),
+    supabase
+      .from("events")
+      .select(`${select}, event_participants!inner(person_id)`)
+      .eq("event_type", "hearing")
+      .eq("event_participants.person_id", personId),
+  ])
+  const all = new Map<string, PersonHearing>()
+  for (const e of [...(byCase.data ?? []), ...(byParticipant.data ?? [])] as unknown as PersonHearing[]) {
+    all.set(e.id, { id: e.id, title: e.title, subtype: e.subtype, status: e.status, starts_at: e.starts_at, location: e.location, case: e.case })
+  }
+  return [...all.values()].sort((a, b) => b.starts_at.localeCompare(a.starts_at))
 }
 
 export async function getPerson(id: string) {

@@ -19,7 +19,6 @@ export type CaseFilters = {
   type: string
   status: string
   priority: string
-  assigned: string
   from: string
   to: string
   due: string
@@ -43,7 +42,6 @@ export function parseCaseFilters(params: RawParams): CaseFilters {
     type: first(params.type),
     status: status === "all" || CASE_STATUSES.some((s) => s.value === status) ? status : "",
     priority: CASE_PRIORITIES.some((p) => p.value === priority) ? priority : "",
-    assigned: first(params.assigned),
     from: date(first(params.from)),
     to: date(first(params.to)),
     due: ["overdue", "week"].includes(first(params.due)) ? first(params.due) : "",
@@ -57,7 +55,7 @@ export function sanitizeSearch(q: string) {
   return q.replace(/[%,()*\\:"']/g, " ").trim()
 }
 
-export async function listCases(filters: CaseFilters, currentUserId: string) {
+export async function listCases(filters: CaseFilters) {
   const supabase = await createClient()
   const today = todayKey()
 
@@ -73,9 +71,6 @@ export async function listCases(filters: CaseFilters, currentUserId: string) {
   if (filters.status && filters.status !== "all") query = query.eq("status", filters.status)
   else if (!filters.status) query = query.neq("status", "archived")
   if (filters.priority) query = query.eq("priority", filters.priority)
-  if (filters.assigned === "me") query = query.eq("assigned_to", currentUserId)
-  else if (filters.assigned === "unassigned") query = query.is("assigned_to", null)
-  else if (filters.assigned) query = query.eq("assigned_to", filters.assigned)
   if (filters.from) query = query.gte("date_filed", filters.from)
   if (filters.to) query = query.lte("date_filed", filters.to)
   if (filters.due) {

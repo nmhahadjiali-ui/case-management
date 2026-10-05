@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { cookies } from "next/headers"
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { requireSession } from "@/lib/auth"
 import { isAdmin } from "@/lib/permissions"
 import { denied, fail, invalid, type ActionResult } from "@/lib/action-result"
@@ -25,6 +26,21 @@ export async function updateProfile(values: ProfileInput): Promise<ActionResult>
   const parsed = profileSchema.safeParse(values)
   if (!parsed.success) return invalid(parsed.error)
 
+  const email = parsed.data.email?.trim().toLowerCase()
+  const emailChanged = Boolean(email && email !== session.profile.email.toLowerCase())
+  if (emailChanged && !isAdmin(session.profile.role)) return denied()
+
+  if (emailChanged) {
+    // Changed through the Auth admin API; the on_auth_user_email_changed trigger syncs profiles.email.
+    const { error } = await createAdminClient().auth.admin.updateUserById(session.userId, { email, email_confirm: true })
+    if (error) {
+      if (/already|registered|exists/i.test(error.message)) {
+        return { ok: false, error: "That email is already used by another account.", fieldErrors: { email: ["Email already registered"] } }
+      }
+      return fail({ message: error.message }, "updateProfile.email")
+    }
+  }
+
   const supabase = await createClient()
   const { error } = await supabase
     .from("profiles")
@@ -32,7 +48,7 @@ export async function updateProfile(values: ProfileInput): Promise<ActionResult>
     .eq("id", session.userId)
   if (error) return fail(error, "updateProfile")
   revalidatePath("/", "layout")
-  return { ok: true, message: "Profile updated." }
+  return { ok: true, message: emailChanged ? "Profile and sign-in email updated." : "Profile updated." }
 }
 
 /** Saves the public URL of an avatar the browser uploaded to the avatars bucket. */

@@ -8,27 +8,25 @@ import { NativeSelect } from "@/components/shared/native-select"
 import { useQueryParams } from "@/hooks/use-query-params"
 import { CASE_PRIORITIES, CASE_STATUSES } from "@/lib/constants"
 import type { CaseFilters as Filters } from "@/lib/data/cases"
-import type { CaseType, ProfileOption } from "@/lib/types"
+import type { CaseType } from "@/lib/types"
 
 const DUE_LABELS: Record<string, string> = { overdue: "Overdue", week: "Due this week" }
 
 export function CaseFilters({
   filters,
   caseTypes,
-  staff,
 }: {
   filters: Filters
   caseTypes: CaseType[]
-  staff: ProfileOption[]
 }) {
   const { setParams } = useQueryParams()
   const active = Boolean(
-    filters.type || filters.status || filters.priority || filters.assigned || filters.from || filters.to || filters.due || filters.q
+    filters.type || filters.status || filters.priority || filters.from || filters.to || filters.due || filters.q
   )
 
   return (
     <div className="grid gap-3">
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
         <div className="grid gap-1">
           <Label htmlFor="f-type" className="text-xs text-muted-foreground">Case type</Label>
           <NativeSelect id="f-type" value={filters.type} onChange={(e) => setParams({ type: e.target.value })}>
@@ -58,17 +56,6 @@ export function CaseFilters({
           </NativeSelect>
         </div>
         <div className="grid gap-1">
-          <Label htmlFor="f-assigned" className="text-xs text-muted-foreground">Assigned staff</Label>
-          <NativeSelect id="f-assigned" value={filters.assigned} onChange={(e) => setParams({ assigned: e.target.value })}>
-            <option value="">Anyone</option>
-            <option value="me">Assigned to me</option>
-            <option value="unassigned">Unassigned</option>
-            {staff.map((s) => (
-              <option key={s.id} value={s.id}>{s.full_name}</option>
-            ))}
-          </NativeSelect>
-        </div>
-        <div className="grid gap-1">
           <Label htmlFor="f-from" className="text-xs text-muted-foreground">Filed from</Label>
           <Input id="f-from" type="date" value={filters.from} max={filters.to || undefined} onChange={(e) => setParams({ from: e.target.value })} />
         </div>
@@ -90,7 +77,7 @@ export function CaseFilters({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setParams({ type: "", status: "", priority: "", assigned: "", from: "", to: "", due: "", q: "" })}
+            onClick={() => setParams({ type: "", status: "", priority: "", from: "", to: "", due: "", q: "" })}
           >
             <FilterXIcon /> Clear filters
           </Button>

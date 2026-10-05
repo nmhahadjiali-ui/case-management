@@ -18,8 +18,8 @@ export const metadata: Metadata = { title: "Case Management" }
 export default async function CasesPage({ searchParams }: PageProps<"/cases">) {
   const session = await requireSession()
   const filters = parseCaseFilters(await searchParams)
-  const [{ rows, total }, lookups] = await Promise.all([listCases(filters, session.userId), getLookups()])
-  const hasFilters = Boolean(filters.q || filters.type || filters.status || filters.priority || filters.assigned || filters.from || filters.to || filters.due)
+  const [{ rows, total }, lookups] = await Promise.all([listCases(filters), getLookups()])
+  const hasFilters = Boolean(filters.q || filters.type || filters.status || filters.priority || filters.from || filters.to || filters.due)
 
   return (
     <div className="space-y-6">
@@ -37,7 +37,7 @@ export default async function CasesPage({ searchParams }: PageProps<"/cases">) {
       <Card>
         <CardContent className="grid gap-4">
           <SearchInput placeholder="Search case number, title, complainant or defendant…" className="sm:max-w-md" />
-          <CaseFilters filters={filters} caseTypes={lookups.caseTypes} staff={lookups.staff} />
+          <CaseFilters filters={filters} caseTypes={lookups.caseTypes} />
         </CardContent>
       </Card>
       <CaseTable rows={rows} staff={lookups.staff} role={session.profile.role} userId={session.userId} hasFilters={hasFilters} />

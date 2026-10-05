@@ -2,11 +2,12 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { CalendarDaysIcon, MenuIcon, ScrollTextIcon } from "lucide-react"
+import { MenuIcon, ScrollTextIcon } from "lucide-react"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Sidebar } from "@/components/layout/sidebar"
+import { CalendarMenu } from "@/components/layout/calendar-menu"
 import { NotificationsMenu } from "@/components/layout/notifications-menu"
 import { DateTimeDisplay, Greeting } from "@/components/layout/header-clock"
 import { setSidebarCollapsed } from "@/lib/actions/settings"
@@ -97,9 +98,7 @@ export function AppShell({
             <HeaderIconLink href="/oath" label="Oath">
               <ScrollTextIcon />
             </HeaderIconLink>
-            <HeaderIconLink href="/calendar" label="Calendar">
-              <CalendarDaysIcon />
-            </HeaderIconLink>
+            <CalendarMenu />
             <NotificationsMenu userId={profile.id} initialItems={notifications} initialUnread={unread} />
           </div>
         </header>

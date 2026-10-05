@@ -6,8 +6,16 @@ import { enumOf, optionalId, optionalText, requiredText } from "./helpers"
 export const profileSchema = z.object({
   full_name: requiredText("Full name", 120),
   department_id: optionalId,
+  // Only administrators may change their sign-in email (enforced in updateProfile).
+  email: z.email("Enter a valid email address").optional(),
 })
 export type ProfileInput = z.infer<typeof profileSchema>
+
+export const emailChangeRequestSchema = z.object({
+  new_email: z.email("Enter a valid email address"),
+  reason: optionalText(500),
+})
+export type EmailChangeRequestInput = z.infer<typeof emailChangeRequestSchema>
 
 export const notificationPrefsSchema = z.object({
   hearing_reminders: z.boolean(),

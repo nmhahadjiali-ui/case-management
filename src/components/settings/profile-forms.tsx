@@ -84,17 +84,31 @@ export function AvatarUpload({ profile }: { profile: Profile }) {
   )
 }
 
-export function ProfileForm({ profile, departments }: { profile: Profile; departments: Department[] }) {
+export function ProfileForm({
+  profile,
+  departments,
+  canEditEmail,
+}: {
+  profile: Profile
+  departments: Department[]
+  canEditEmail: boolean
+}) {
   const router = useRouter()
   const form = useForm<ProfileInput>({
     resolver: zodResolver(profileSchema),
-    defaultValues: { full_name: profile.full_name, department_id: profile.department_id ?? "" },
+    defaultValues: {
+      full_name: profile.full_name,
+      department_id: profile.department_id ?? "",
+      email: canEditEmail ? profile.email : undefined,
+    },
   })
   const { errors, isSubmitting, isDirty } = form.formState
 
   async function onSubmit(values: ProfileInput) {
     const res = await updateProfile(values)
     if (!res.ok) {
+      const emailError = res.fieldErrors?.email?.[0]
+      if (emailError) form.setError("email", { message: emailError })
       toast.error(res.error)
       return
     }
@@ -108,9 +122,18 @@ export function ProfileForm({ profile, departments }: { profile: Profile; depart
       <FormField label="Full name" htmlFor="full_name" error={errors.full_name?.message} required>
         <Input autoComplete="name" {...form.register("full_name")} />
       </FormField>
-      <FormField label="Email" htmlFor="email" description="Contact an administrator to change your sign-in email.">
-        <Input type="email" value={profile.email} readOnly disabled />
-      </FormField>
+      {/* Non-administrators change their email through a request (see EmailChangePanel). */}
+      {canEditEmail && (
+        <FormField
+          label="Email"
+          htmlFor="email"
+          error={errors.email?.message}
+          description="This is your sign-in email. The change takes effect immediately."
+          required
+        >
+          <Input type="email" autoComplete="email" {...form.register("email")} />
+        </FormField>
+      )}
       <FormField label="Department / Office" htmlFor="department_id" error={errors.department_id?.message}>
         <NativeSelect {...form.register("department_id")}>
           <option value="">None</option>
