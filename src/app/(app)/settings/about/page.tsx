@@ -1,7 +1,9 @@
 import type { Metadata } from "next"
-import { ScaleIcon, UserIcon } from "lucide-react"
+import { UserIcon } from "lucide-react"
+import { BrandLogo } from "@/components/shared/brand-logo"
 import { SettingsSection } from "@/components/settings/settings-section"
 import { requireSession } from "@/lib/auth"
+import { getBranding } from "@/lib/data/branding"
 import { APP_COPYRIGHT_START, APP_DEVELOPER, APP_NAME, APP_TAGLINE } from "@/lib/constants"
 import pkg from "@/../package.json"
 
@@ -35,7 +37,7 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
 }
 
 export default async function AboutPage() {
-  await requireSession()
+  const [, branding] = await Promise.all([requireSession(), getBranding()])
   const year = new Date().getFullYear()
   const years = year > APP_COPYRIGHT_START ? `${APP_COPYRIGHT_START}–${year}` : `${APP_COPYRIGHT_START}`
 
@@ -43,9 +45,7 @@ export default async function AboutPage() {
     <>
       <SettingsSection title="About">
         <div className="grid gap-6 sm:grid-cols-[auto_1fr] sm:items-start">
-          <div className="flex size-14 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-            <ScaleIcon className="size-7" aria-hidden />
-          </div>
+          <BrandLogo src={branding.appLogoUrl} size="lg" />
           <div className="grid gap-4">
             <div>
               <p className="text-lg font-semibold">{APP_NAME}</p>

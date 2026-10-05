@@ -7,6 +7,7 @@ import {
   BriefcaseIcon,
   CalendarIcon,
   FileClockIcon,
+  ImageIcon,
   InfoIcon,
   PaletteIcon,
   ServerIcon,
@@ -35,6 +36,7 @@ const GROUPS: { title: string; items: Item[] }[] = [
     items: [
       { href: "/settings/cases", label: "Case Management", icon: BriefcaseIcon },
       { href: "/settings/users", label: "Users & Roles", icon: UsersIcon, adminOnly: true },
+      { href: "/settings/branding", label: "Branding", icon: ImageIcon, adminOnly: true },
       { href: "/settings/audit-logs", label: "Audit Logs", icon: FileClockIcon, adminOnly: true },
       { href: "/settings/system", label: "System", icon: ServerIcon, adminOnly: true },
     ],

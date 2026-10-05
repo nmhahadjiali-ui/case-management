@@ -187,3 +187,42 @@ export async function updateOath(values: OathInput): Promise<ActionResult> {
   revalidatePath("/oath")
   return { ok: true, message: "Oath updated." }
 }
+
+export type BrandingLogoKind = "app" | "splash"
+
+/**
+ * Save (url) or reset to the built-in default (null) the app logo or the splash
+ * logo. The browser uploads the file to the public "branding" bucket first.
+ */
+export async function updateBrandingLogo(kind: BrandingLogoKind, url: string | null): Promise<ActionResult> {
+  const session = await requireSession()
+  if (!isAdmin(session.profile.role)) return denied()
+  if (kind !== "app" && kind !== "splash") return { ok: false, error: "Invalid logo type." }
+  const base = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/branding/`
+  if (url !== null && !url.startsWith(`${base}${kind}/`)) return { ok: false, error: "Invalid image." }
+
+  const supabase = await createClient()
+  const { data: current } = await supabase.from("app_settings").select("value").eq("key", "branding").maybeSingle()
+  const value: Record<string, string | null> = {
+    app_logo_url: null,
+    splash_logo_url: null,
+    ...((current?.value ?? {}) as Record<string, string | null>),
+  }
+  const field = kind === "app" ? "app_logo_url" : "splash_logo_url"
+  const previous = value[field]
+  value[field] = url
+
+  const { error } = await supabase
+    .from("app_settings")
+    .upsert({ key: "branding", value, updated_by: session.userId, updated_at: new Date().toISOString() })
+  if (error) return fail(error, "updateBrandingLogo")
+
+  // Remove the replaced file; a leftover file is harmless, so failures are ignored.
+  if (previous && previous !== url && previous.startsWith(base)) {
+    await supabase.storage.from("branding").remove([previous.slice(base.length)])
+  }
+
+  revalidatePath("/", "layout")
+  const label = kind === "app" ? "App logo" : "Splash screen logo"
+  return { ok: true, message: url ? `${label} updated.` : `${label} reset to default.` }
+}

@@ -30,6 +30,7 @@ function HeaderIconLink({ href, label, children }: { href: string; label: string
 
 export function AppShell({
   profile,
+  appLogoUrl,
   initialCollapsed,
   initialGreeting,
   notifications,
@@ -37,6 +38,7 @@ export function AppShell({
   children,
 }: {
   profile: Profile
+  appLogoUrl: string | null
   initialCollapsed: boolean
   initialGreeting: string
   notifications: AppNotification[]
@@ -65,14 +67,14 @@ export function AppShell({
           collapsed ? "w-[4.25rem]" : "w-64"
         )}
       >
-        <Sidebar profile={profile} collapsed={collapsed} />
+        <Sidebar profile={profile} logoUrl={appLogoUrl} collapsed={collapsed} />
       </aside>
 
       {/* Mobile / tablet drawer */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         <SheetContent side="left" className="w-72 max-w-[85vw] p-0" showCloseButton={false}>
           <SheetTitle className="sr-only">Navigation</SheetTitle>
-          <Sidebar profile={profile} collapsed={false} onNavigate={() => setMobileOpen(false)} />
+          <Sidebar profile={profile} logoUrl={appLogoUrl} collapsed={false} onNavigate={() => setMobileOpen(false)} />
         </SheetContent>
       </Sheet>
 

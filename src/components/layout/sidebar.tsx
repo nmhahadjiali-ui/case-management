@@ -2,7 +2,8 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LogOutIcon, ScaleIcon } from "lucide-react"
+import { LogOutIcon } from "lucide-react"
+import { BrandLogo } from "@/components/shared/brand-logo"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { UserAvatar } from "@/components/shared/user-avatar"
 import { NAV_ITEMS, isActivePath } from "@/components/layout/nav-items"
@@ -24,10 +25,12 @@ function MaybeTooltip({ show, label, children }: { show: boolean; label: string;
 
 export function Sidebar({
   profile,
+  logoUrl,
   collapsed,
   onNavigate,
 }: {
   profile: Profile
+  logoUrl: string | null
   collapsed: boolean
   onNavigate?: () => void
 }) {
@@ -37,9 +40,7 @@ export function Sidebar({
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
       {/* Logo */}
       <div className={cn("flex h-16 shrink-0 items-center gap-3 border-b px-4", collapsed && "justify-center px-0")}>
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-          <ScaleIcon className="size-5" aria-hidden />
-        </div>
+        <BrandLogo src={logoUrl} />
         {!collapsed && (
           <div className="min-w-0 leading-tight">
             <p className="truncate font-semibold">{APP_NAME}</p>
