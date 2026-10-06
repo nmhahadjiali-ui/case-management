@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { SettingsSection } from "@/components/settings/settings-section"
+import { ResetDataCard } from "@/components/settings/reset-data"
 import { requireRole } from "@/lib/auth"
 import { createClient } from "@/lib/supabase/server"
 import { APP_TIMEZONE } from "@/lib/datetime"
@@ -19,7 +20,7 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
 }
 
 export default async function SystemPage() {
-  await requireRole("administrator")
+  const session = await requireRole("administrator")
   const supabase = await createClient()
   const { data } = await supabase.rpc("get_system_info")
   const info = data as SystemInfo | null
@@ -68,6 +69,9 @@ export default async function SystemPage() {
             <li>Storage files are not included in database backups; copy the bucket separately (e.g. via the S3-compatible API).</li>
           </ul>
         </div>
+      </SettingsSection>
+      <SettingsSection title="Danger zone" description="Delete all data and start over. Make a backup first if you may need it.">
+        <ResetDataCard adminEmail={session.email} />
       </SettingsSection>
     </>
   )
