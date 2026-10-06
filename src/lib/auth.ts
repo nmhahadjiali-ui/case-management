@@ -7,11 +7,20 @@ import type { Profile } from "@/lib/types"
 
 export type Session = { userId: string; email: string; profile: Profile }
 
+/**
+ * The signed-in user's id from the verified JWT, or null. No database round trip,
+ * so pages can start their queries in parallel with requireSession().
+ */
+export const getUserId = cache(async (): Promise<string | null> => {
+  const supabase = await createClient()
+  const { data } = await supabase.auth.getClaims()
+  return data?.claims?.sub ?? null
+})
+
 /** The signed-in user and profile, or null. Cached per request. */
 export const getSession = cache(async (): Promise<Session | null> => {
   const supabase = await createClient()
-  const { data: claimsData } = await supabase.auth.getClaims()
-  const userId = claimsData?.claims?.sub
+  const userId = await getUserId()
   if (!userId) return null
 
   const { data: profile } = await supabase

@@ -16,9 +16,8 @@ import { canWrite } from "@/lib/permissions"
 export const metadata: Metadata = { title: "People" }
 
 export default async function PeoplePage({ searchParams }: PageProps<"/people">) {
-  const session = await requireSession()
   const filters = parsePeopleFilters(await searchParams)
-  const [{ rows, total }, lookups] = await Promise.all([listPeople(filters), getLookups()])
+  const [session, { rows, total }, lookups] = await Promise.all([requireSession(), listPeople(filters), getLookups()])
   const writable = canWrite(session.profile.role)
   const hasFilters = Boolean(filters.q || filters.role || filters.status || filters.type)
 

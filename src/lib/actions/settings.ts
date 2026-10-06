@@ -1,6 +1,6 @@
 "use server"
 
-import { revalidatePath } from "next/cache"
+import { revalidatePath, updateTag } from "next/cache"
 import { cookies } from "next/headers"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
@@ -20,6 +20,7 @@ import {
   type ProfileInput,
 } from "@/lib/validations/settings"
 import { nullIfEmpty } from "@/lib/validations/helpers"
+import { BRANDING_TAG } from "@/lib/data/branding"
 
 export async function updateProfile(values: ProfileInput): Promise<ActionResult> {
   const session = await requireSession()
@@ -222,6 +223,7 @@ export async function updateBrandingLogo(kind: BrandingLogoKind, url: string | n
     await supabase.storage.from("branding").remove([previous.slice(base.length)])
   }
 
+  updateTag(BRANDING_TAG)
   revalidatePath("/", "layout")
   const label = kind === "app" ? "App logo" : "Splash screen logo"
   return { ok: true, message: url ? `${label} updated.` : `${label} reset to default.` }

@@ -7,7 +7,7 @@ import { SearchInput } from "@/components/shared/search-input"
 import { EmptyState } from "@/components/shared/empty-state"
 import { TaskFilters } from "@/components/tasks/task-filters"
 import { TaskItem } from "@/components/tasks/task-item"
-import { requireSession } from "@/lib/auth"
+import { getUserId, requireSession } from "@/lib/auth"
 import { getTaskCounts, listTasks, parseTaskFilters } from "@/lib/data/tasks"
 import { getCaseOptions, getLookups } from "@/lib/data/lookups"
 import { canWrite } from "@/lib/permissions"
@@ -15,11 +15,13 @@ import { canWrite } from "@/lib/permissions"
 export const metadata: Metadata = { title: "Tasks" }
 
 export default async function TasksPage({ searchParams }: PageProps<"/tasks">) {
-  const session = await requireSession()
-  const filters = parseTaskFilters(await searchParams)
-  const [tasks, counts, lookups, cases] = await Promise.all([
-    listTasks(filters, session.userId),
-    getTaskCounts(session.userId),
+  const [userId, params] = await Promise.all([getUserId(), searchParams])
+  const filters = parseTaskFilters(params)
+  // Everything in parallel; RLS scopes each query to the signed-in user.
+  const [session, tasks, counts, lookups, cases] = await Promise.all([
+    requireSession(),
+    listTasks(filters, userId ?? ""),
+    getTaskCounts(userId ?? ""),
     getLookups(),
     getCaseOptions(),
   ])

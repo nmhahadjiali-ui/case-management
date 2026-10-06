@@ -16,9 +16,8 @@ import { canWrite } from "@/lib/permissions"
 export const metadata: Metadata = { title: "Case Management" }
 
 export default async function CasesPage({ searchParams }: PageProps<"/cases">) {
-  const session = await requireSession()
   const filters = parseCaseFilters(await searchParams)
-  const [{ rows, total }, lookups] = await Promise.all([listCases(filters), getLookups()])
+  const [session, { rows, total }, lookups] = await Promise.all([requireSession(), listCases(filters), getLookups()])
   const hasFilters = Boolean(filters.q || filters.type || filters.status || filters.priority || filters.from || filters.to || filters.due)
 
   return (

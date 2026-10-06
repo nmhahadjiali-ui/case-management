@@ -11,11 +11,10 @@ export const metadata: Metadata = { title: "Notifications" }
 const PAGE_SIZE = 25
 
 export default async function NotificationsPage({ searchParams }: PageProps<"/notifications">) {
-  await requireSession()
   const params = await searchParams
   const filter = params.filter === "unread" ? "unread" : "all"
   const page = Math.max(1, Number(params.page) || 1)
-  const { items, total } = await listNotifications(filter, page, PAGE_SIZE)
+  const [, { items, total }] = await Promise.all([requireSession(), listNotifications(filter, page, PAGE_SIZE)])
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">

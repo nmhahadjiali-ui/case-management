@@ -20,14 +20,18 @@ export const metadata: Metadata = { title: "Calendar" }
 const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) ?? ""
 
 export default async function CalendarPage({ searchParams }: PageProps<"/calendar">) {
-  const session = await requireSession()
-  const params = await searchParams
   const supabase = await createClient()
-  const { data: settings } = await supabase
-    .from("user_settings")
-    .select("default_calendar_view, working_hours_start, working_hours_end")
-    .eq("user_id", session.userId)
-    .maybeSingle<Pick<UserSettings, "default_calendar_view" | "working_hours_start" | "working_hours_end">>()
+  // RLS returns only the signed-in user's settings row, so no user id is needed here.
+  const [session, params, { data: settings }, cases, people] = await Promise.all([
+    requireSession(),
+    searchParams,
+    supabase
+      .from("user_settings")
+      .select("default_calendar_view, working_hours_start, working_hours_end")
+      .maybeSingle<Pick<UserSettings, "default_calendar_view" | "working_hours_start" | "working_hours_end">>(),
+    getCaseOptions(),
+    getPersonOptions(),
+  ])
 
   const today = todayKey()
   const viewParam = one(params.view)
@@ -46,11 +50,7 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
   const rangeStart = date < startKey ? date : startKey
   const rangeEnd = date > endKey ? date : endKey
 
-  const [events, cases, people] = await Promise.all([
-    listEvents({ startKey: rangeStart, endKey: rangeEnd, type, q }),
-    getCaseOptions(),
-    getPersonOptions(),
-  ])
+  const events = await listEvents({ startKey: rangeStart, endKey: rangeEnd, type, q })
 
   const hour = (t: string | undefined, fallback: number) => (t ? Number(t.slice(0, 2)) : fallback)
 
