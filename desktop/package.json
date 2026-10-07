@@ -1,0 +1,45 @@
+{
+  "name": "caseflow-desktop",
+  "productName": "CaseFlow",
+  "version": "1.0.0",
+  "description": "CaseFlow — Case Management System (desktop app)",
+  "author": "Nahed M. Hadji Ali",
+  "private": true,
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis"
+  },
+  "build": {
+    "appId": "com.nahedhadjiali.caseflow",
+    "productName": "CaseFlow",
+    "copyright": "© 2026 Nahed M. Hadji Ali",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.cjs",
+      "app.config.json",
+      "offline.html",
+      "build/icon.png"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "CaseFlow",
+      "artifactName": "CaseFlow-Setup-${version}.${ext}"
+    }
+  },
+  "devDependencies": {
+    "electron": "^44.6.0",
+    "electron-builder": "^26.15.3"
+  }
+}

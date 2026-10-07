@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Electron desktop wrapper has its own package and tooling.
+    "desktop/**",
   ]),
 ]);
 
